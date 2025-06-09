@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random ID Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .api-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: transform 0.2s;
+        }
+        .api-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .api-section h2 {
+            margin-top: 0;
+            color: #444;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            word-break: break-all;
+            min-height: 20px;
+        }
+        .loading {
+            display: none;
+            color: #666;
+            margin: 10px 0;
+        }
+        .api-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Random ID Generator</h1>
+        <div class="api-info">
+            Click the buttons below to generate random IDs from different APIs. 
+            Each API provides unique identifiers in different formats.
+        </div>
+        {% for api in apis %}
+        <div class="api-section">
+            <h2>{{ api.name }}</h2>
+            <button onclick="getRandomId({{ loop.index0 }})">Generate Random ID</button>
+            <div class="loading" id="loading-{{ loop.index0 }}">Loading...</div>
+            <div id="result-{{ loop.index0 }}" class="result"></div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        async function getRandomId(apiIndex) {
+            const loadingElement = document.getElementById(`loading-${apiIndex}`);
+            const resultElement = document.getElementById(`result-${apiIndex}`);
+            
+            loadingElement.style.display = 'block';
+            resultElement.textContent = '';
+            resultElement.className = 'result';
+            
+            try {
+                const response = await fetch(`/api/random-id/${apiIndex}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                resultElement.textContent = `ID: ${data.id}`;
+            } catch (error) {
+                resultElement.className = 'result error';
+                resultElement.textContent = `Error: ${error.message}`;
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html> 
